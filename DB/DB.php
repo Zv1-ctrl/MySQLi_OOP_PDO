@@ -4,32 +4,26 @@ class DB{
 
     private static ?DB $instance = null;
 
-    public mysqli $conn;
+    public ?PDO $connpdo;
 
-    public function __construct()  {
+    private function __construct()  {
 
-        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+        $dsn = "mysql:host=localhost;dbname=WebTrgovina;charset=utf8";
+        $user = "web01";
+        $pass = "12345";
 
         try{
-            $this->conn = new mysqli("localhost","web01","12345","WebTrgovina");
-            $this->conn->set_charset("utf8");
-            //echo "Konekcija uspješna";
+            $this->connpdo = new PDO($dsn, $user, $pass, array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ));
         }
-        catch(mysqli_sql_exception $e){
-            die("Greška s bazom: ".$e->getMessage());
+        catch (PDOException $e) 
+        {
+            die("Connection failed: " . $e->getMessage());
         }
-        
     }
 
-    public static function getInstance(): DB{
-        return self::$instance ??= new DB();
-    }
-
-    public function __destruct(){
-        if($this->conn){
-            $this->conn->close();
-        }
-    }
 }
 
 ?>
